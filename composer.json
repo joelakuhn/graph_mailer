@@ -1,0 +1,23 @@
+{
+    "name": "joel/graph_mailer",
+    "description": "Wordpress plugin to send emails through the Office 365 Graph API because there is no god.",
+    "type": "project",
+    "require": {
+        "thenetworg/oauth2-azure": "^2.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Joel\\GraphMailer\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Joel Kuhn",
+            "email": "jakuhn@indianatech.edu"
+        }
+    ],
+    "config": {
+        "vendor-dir": "src/vendor"
+    }
+}
