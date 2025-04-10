@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Graph Mailer for Indiana Tech
+ * Plugin Name:       Graph Mailer
  * Description:       Send email through Microsofts dumbass graph API instead of SMTP.
  */
 
