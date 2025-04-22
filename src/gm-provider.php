@@ -59,6 +59,9 @@ class GMProvider {
             $token = $provider->getAccessToken('refresh_token', [
                 'refresh_token' => $token->getRefreshToken()
             ]);
+            if ($token) {
+                GMSettings::update_option('token', $token);
+            }
         }
 
         return $token;
