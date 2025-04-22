@@ -7,23 +7,23 @@ require_once 'gm-provider.php';
 
 class GMMailer {
     public static function init() {
-        add_filter('wp_mail', [ self::class, 'intercept' ]);
+        if (GMProvider::is_authorized()) {
+            add_filter('wp_mail', [ self::class, 'intercept' ]);
+            add_filter('pre_wp_mail', [ self::class, 'inform' ]);
+        }
     }
 
-    public static function intercept($mail) {
-        if (!GMProvider::is_authorized()) return $mail;
-        if (!is_array($mail)) return $mail;
-
-        $to           = self::parse_addresses($mail['to']);
+    public static function wp_mail($to, $subject, $message = '', $headers = [], $attachments = []) {
+        $to           = self::parse_addresses($to);
         $from         = self::parse_from_address(GMSettings::get_option('from', false));
-        $headers      = self::parse_headers($mail['headers']);
+        $headers      = self::parse_headers($headers);
         $content_type = self::parse_content_type($headers['content-type'] ?? '');
         $cc           = self::parse_addresses($headers['cc'] ?? []);
         $bcc          = self::parse_addresses($headers['bcc'] ?? []);
         $reply_to     = self::parse_addresses($headers['reply-to'] ?? []);
-        $subject      = $mail['subject'];
-        $message      = $mail['message'];
-        $attachments  = self::parse_attachments($mail['attachments']);
+        $subject      = $subject;
+        $message      = $message;
+        $attachments  = self::parse_attachments($attachments);
 
         $request = [
             'message' => [
@@ -45,6 +45,18 @@ class GMMailer {
         GMProvider::post('/v1.0/me/sendMail', $request);
 
         return null;
+    }
+
+    public static function intercept($mail) {
+        if (!is_array($mail)) return $mail;
+
+        self::wp_mail($mail['to'], $mail['subject'], $mail['message'], $mail['headers'], $mail['attachments']);
+        return null;
+    }
+
+    // Any value other than null will let WP know that the email has been handled.
+    public static function inform($_null) {
+        return true;
     }
 
     private static function parse_headers($headers) {
